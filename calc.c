@@ -1,6 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include <stdlib.h>
 
 #include "calc.h"
 
@@ -38,4 +39,10 @@ from_working_time_to_maya (double wt) {
      mt.mayaT_uinal = (c/UINAL);
      mt.mayaT_kin = d;
      return mt;
+}
+
+void print_long_round(struct mayaT *mt) {
+     printf("%d.%d.%d.%d.%d\n", (int)mt->mayaT_baktun,
+            (int)mt->mayaT_katun, (int)mt->mayaT_tun,
+            (int)mt->mayaT_uinal, (int)mt->mayaT_kin);
 }
