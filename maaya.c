@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <MagickWand/MagickWand.h>
 
+#include "calc.h"
 #include "drw.h"
+
 #include "config.h"
 
 int main(int argc,char **argv)
