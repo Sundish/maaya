@@ -1,15 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include <MagickWand/MagickWand.h>
+
+#include "config.h"
 
 #include "calc.h"
 #include "drw.h"
 
-#include "config.h"
 
-int main(int argc,char **argv)
+
+static void
+usage (void)
 {
+     fputs("usage maaya [-l print long round]\n", stderr);
+     exit(1);
+}
+
+int
+main(int argc, char *argv[])
+{
+     struct mayaT wm;
+     unsigned int num_to_convert;
+
      MagickWand *m_wand = NULL;
      DrawingWand *d_wand = NULL;
      PixelWand *c_wand = NULL;
@@ -23,6 +37,17 @@ int main(int argc,char **argv)
 
      /* Circle Variables */
      unsigned int dwr_ndots, distance;
+     unsigned width, height;
+
+     /* for (int i = 1; i < argc; i++) */
+     /* 	  if (!strcmp(argv[i], "-l")) { */
+     /* 	       wm = from_working_time_to_maya(get_working_time()); */
+     /* 	       print_long_round(&wm); */
+     /* 	       exit(0); */
+     /* 	  } else if (!strcmp(argv[i], "-p")) */
+     /* 	       num_to_convert = atoi(argv[i++]); */
+     /* 	  else */
+     /* 	       usage(); */
 
      /* Check for user input if non exit program */
      if (argc != 2){
@@ -38,16 +63,20 @@ int main(int argc,char **argv)
 
      diameter = 640;
      distance = diameter/(dwr_ndots == 0 ? 1 : dwr_ndots + 1); /* Avoid division by zero :P */
-     MagickWandGenesis();
 
+     MagickWandGenesis();
      m_wand = NewMagickWand();
+     MagickReadImage(m_wand,
+		     "/home/sundish/Wallpapers/wal/art_cat.jpg");
+
      d_wand = NewDrawingWand();
      c_wand = NewPixelWand();
 
-     PixelSetColor(c_wand, background_color);
-     MagickNewImage(m_wand, diameter, diameter, c_wand);
+     /* width = MagickGetImageWidth(m_wand); */
+     /* height = MagickGetImageHeight(m_wand); */
 
-     DrawSetStrokeOpacity(d_wand,1);
+     PixelSetColor(c_wand, background_color);
+     DrawSetStrokeOpacity(d_wand, 1.0);
 
 // circle and rectangle
      PushDrawingWand(d_wand);
@@ -61,31 +90,28 @@ int main(int argc,char **argv)
      DrawSetStrokeWidth(d_wand,4);
      DrawSetStrokeAntialias(d_wand,1);
      PixelSetColor(c_wand, foreground_color);
+
      //DrawSetStrokeOpacity(d_wand,1);
      DrawSetFillColor(d_wand,c_wand);
+     DrawTranslate(d_wand, x_margin, y_margin);
 
      /* Draw any required ones (circles) */
-     for (int n=0; n < dwr_ndots ; n++)
-          DrawCircle(d_wand, (distance*(n + 1)), x_pos + y_padding,
-                     (distance*(n + 1)) + 30, x_pos + y_padding);
+     drw_dots(d_wand, dwr_ndots, distance, &x_pos, y_padding);
 
      x_pos = dwr_ndots == 0 ? 50 : 100 + y_padding;
-
      /* Draw any required fives (rectangles) */
-     for (int n=0; n < dwr_nbars; n++)
-     {
-          DrawRectangle(d_wand, 50, x_pos, 600, x_pos + y_width);
-          x_pos += y_width + y_padding;
-     }
+     drw_bars(d_wand, dwr_nbars, distance, &x_pos, y_width, y_padding);
 
      PopDrawingWand(d_wand);
 
-     MagickDrawImage(m_wand,d_wand);
-     MagickWriteImage(m_wand, output_image);
+     MagickDrawImage(m_wand, d_wand);
+
+     MagickWriteImage(m_wand, "test.jpg");
 
      c_wand = DestroyPixelWand(c_wand);
-     m_wand = DestroyMagickWand(m_wand);
      d_wand = DestroyDrawingWand(d_wand);
+     if(m_wand)m_wand = DestroyMagickWand(m_wand);
 
      MagickWandTerminus();
+     return 0;
 }
