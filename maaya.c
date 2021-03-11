@@ -66,8 +66,7 @@ main(int argc, char *argv[])
 
      MagickWandGenesis();
      m_wand = NewMagickWand();
-     MagickReadImage(m_wand,
-		     "/home/sundish/Wallpapers/wal/art_cat.jpg");
+     MagickReadImage(m_wand,"/path/to/image.jpg");
 
      d_wand = NewDrawingWand();
      c_wand = NewPixelWand();
