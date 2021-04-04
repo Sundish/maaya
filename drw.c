@@ -5,21 +5,26 @@
 #include "drw.h"
 
 void
-drw_dots (DrawingWand *wand, unsigned int ndot, unsigned int distance, int *xpos, unsigned int ypadding)
+drw_dots (DrawingWand *wand, unsigned int ndot, unsigned int distance, double *xpos, unsigned int diameter, double ypadding)
 {
-     int xval = *xpos;
+     double xval = *xpos;
+     double radius = diameter > 300 ? diameter*0.046875 : 5;
      for (int n=0; n < ndot ; n++)
        DrawCircle(wand, (distance*(n + 1)), xval + ypadding,
-		  (distance*(n + 1)) + 30, xval + ypadding);
+		  (distance*(n + 1)) + radius, xval + ypadding);
 }
 
 void
-drw_bars (DrawingWand *wand, unsigned int nbar, unsigned int distance, int *xpos, unsigned int ywidth, unsigned int ypadding)
+drw_bars (DrawingWand *wand, unsigned int nbar, unsigned int diameter, double *xpos, double ypadding)
 {
-     int xval = *xpos;
-     for (int n=0; n < nbar; n++)
-     {
-          DrawRectangle(wand, 50, xval, 600, xval + ywidth);
+     double xval = *xpos;
+     double ywidth, xstart, xend;
+     if (diameter > 300) {
+       ywidth = diameter*0.09375;
+       xstart = diameter*0.0781;
+       xend = diameter*0.9375;
+     } for (int n=0; n < nbar; n++) {
+       DrawRectangle(wand, xstart, xval, xend, xval + ywidth);
           xval += ywidth + ypadding;
      }
      *xpos = xval;

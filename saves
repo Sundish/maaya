@@ -1,0 +1,95 @@
+
+void
+maayaMagickInitialize (MagickWand *m_wand, DrawingWand *d_wand, PixelWand *c_wand, char *path)
+{
+     m_wand = NewMagickWand();
+     MagickReadImage(m_wand, path);
+
+     d_wand = NewDrawingWand();
+     c_wand = NewPixelWand();
+
+     PixelSetColor(c_wand, background_color);
+     DrawSetStrokeOpacity(d_wand, 1.0);
+}
+
+int
+main(int argc, char *argv[])
+{
+     MagickWand *m_wand = NULL;
+     DrawingWand *d_wand = NULL;
+     PixelWand *c_wand = NULL;
+     double x_pos;
+     unsigned long diameter;
+
+     /* Rectangle Variables */
+     unsigned int dwr_nbars, y_width;
+     x_pos = 50;
+     y_width = 60;
+
+     /* Circle Variables */
+     unsigned int dwr_ndots, distance;
+     unsigned width, height;
+
+     Get the input number TODO: detect if the input is a valid number
+     num = atoi(argv[1]);
+     convert(num);
+     dwr_nbars = num/5;
+     dwr_ndots = num%5;
+
+     diameter = 100;
+     distance = diameter/(dwr_ndots == 0 ? 1 : dwr_ndots + 1); /* Avoid division by zero :P */
+
+     MagickWandGenesis();
+
+     m_wand = NewMagickWand();
+     MagickReadImage(m_wand, "/home/sundish/Wallpapers/wal/art_jungle.jpg");
+
+     d_wand = NewDrawingWand();
+     c_wand = NewPixelWand();
+
+
+     PixelSetColor(c_wand, background_color);
+     DrawSetStrokeOpacity(d_wand, 1.0);
+
+     /* width = MagickGetImageWidth(m_wand); */
+
+     /* height = MagickGetImageHeight(m_wand); */
+
+// circle and rectangle
+     PushDrawingWand(d_wand);
+// Hmmmm. Very weird. rgb(0,0,1) draws a black line around the edge
+// of the circle as it should. But rgb(0,0,0) or black don't.
+// AND if I remove the PixelSetColor then it draws a white boundary
+// around the rectangle (and presumably around the circle too)
+     PixelSetColor(c_wand,"rgb(0,0,1)");
+
+     DrawSetStrokeColor(d_wand,c_wand);
+     DrawSetStrokeWidth(d_wand,4);
+     DrawSetStrokeAntialias(d_wand,1);
+     PixelSetColor(c_wand, foreground_color);
+
+     //DrawSetStrokeOpacity(d_wand,1);
+     DrawSetFillColor(d_wand,c_wand);
+     DrawTranslate(d_wand, x_margin, y_margin);
+
+     /* Draw any required ones (circles) */
+     drw_dots(d_wand, dwr_ndots, distance, &x_pos, diameter, diameter*0.03125);
+
+     x_pos = dwr_ndots == 0 ? 50 : 100 + diameter*0.0315;
+
+     /* Draw any required fives (rectangles) */
+     drw_bars(d_wand, dwr_nbars, diameter, &x_pos, diameter*0.03125);
+
+     PopDrawingWand(d_wand);
+
+     MagickDrawImage(m_wand, d_wand);
+
+     MagickWriteImage(m_wand, "test.jpg");
+
+     c_wand = DestroyPixelWand(c_wand);
+     d_wand = DestroyDrawingWand(d_wand);
+     if(m_wand)m_wand = DestroyMagickWand(m_wand);
+
+     MagickWandTerminus();
+     return 0;
+}
