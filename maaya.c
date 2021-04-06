@@ -31,9 +31,9 @@ main(int argc, char *argv[])
 	       print_calendar_round((int)get_working_time());
 	  else if (i + 1 == argc)
 	       usage();
-	  else if (!strcmp(argv[i], "-p")) {
-	       num_to_convert = atoi(argv[i++]);
-	       convert(num_to_convert);
+	  else if (!strcmp(argv[i++], "-p")) {
+	       /* num_to_convert = atoi(argv[i++]); */
+	       string2maya(argv[i]);
 	  } else
 	       usage();
      return 0;

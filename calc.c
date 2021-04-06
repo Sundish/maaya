@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "calc.h"
 
@@ -57,26 +58,27 @@ from_working_time_to_maya (double wt) {
      return mt;
 }
 
-void mprint(int num)
+void
+mprint(int num)
 {
      int dnum, bnum;
      bnum = num/5;
      dnum = num%5;
      if (num == 0) {
-	  printf("<::>\n\n");
-	  return;
+          printf("<::>\n\n");
+          return;
      }
      for (int c = 0; c < dnum; c++)
-	  printf(".");
+          printf(".");
      if (dnum != 0)
-	  printf("\n");
+          printf("\n");
      if (bnum == 1)
-	  printf("----\n");
+          printf("----\n");
      else if (bnum == 2)
-	  printf("====\n");
+          printf("====\n");
      else if (bnum == 3)
-	  printf("≡≡≡≡\n");
-    printf("\n");
+          printf("≡≡≡≡\n");
+     printf("\n");
 }
 
 void
@@ -86,10 +88,10 @@ convert (int num) {
      working_number = num;
 
      for (; get_highest >= 0; get_highest--) {
-	  current_divider = pow(20, get_highest);
-	  mprint((working_number/current_divider));
-	  printf("%d\n", (int)(working_number/current_divider));
-	  working_number = fmod(working_number, current_divider);
+          current_divider = pow(20, get_highest);
+          mprint((working_number/current_divider));
+          printf("%d\n", (int)(working_number/current_divider));
+          working_number = fmod(working_number, current_divider);
      }
 }
 
@@ -111,4 +113,55 @@ print_long_round (struct mayaT *mt) {
      printf("%d.%d.%d.%d.%d\n", (int)mt->mayaT_baktun,
             (int)mt->mayaT_katun, (int)mt->mayaT_tun,
             (int)mt->mayaT_uinal, (int)mt->mayaT_kin);
+}
+
+void fill_mayaT (struct mayaT *mt) {
+     mt->mayaT_baktun = 0;
+     mt->mayaT_katun = 0;
+     mt->mayaT_tun = 0;
+     mt->mayaT_uinal = 0;
+     mt->mayaT_kin = 0;
+}
+
+void
+fill_array(int arr[5])
+{
+     for (int i = 0; i < 5; i++)
+          arr[i] = 0;
+}
+
+void reverse(int *x, int begin, int end) {
+     int c;
+
+     if (begin >= end)
+          return;
+
+     c          = *(x+begin);
+     *(x+begin) = *(x+end);
+     *(x+end)   = c;
+
+     reverse(x, ++begin, --end);
+}
+
+struct mayaT
+*string2maya (char *string) {
+     struct mayaT maya_out;
+     int maya_array[5], i;
+     const char del[2] = ".";
+     char *token;
+     fill_mayaT(&maya_out);
+     fill_array(maya_array);
+     token = strtok(string, del);
+     i = 0;
+     while ( token != NULL ) {
+          maya_array[i] = atoi(token);
+          /* printf(" %s\n", token); */
+          token = strtok(NULL, del);
+          i++;
+     }
+     reverse(maya_array , 0, sizeof(maya_array)/sizeof(maya_array[0]) -1);
+     for (int i = 0; i < 5; i++) {
+          printf("%d\n", maya_array[i]);
+     }
+     return &maya_out;
 }
