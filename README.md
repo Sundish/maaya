@@ -21,7 +21,7 @@ $ 5 Ok 8 Pop
 ## Installation
 Just run `make` and `make install` to copy the binary file to `/usr/bin`
 
-#### NOTE for `make install` you'll need to be in an LINUX system
+#### NOTE for `make install` you'll need to be on a LINUX system
 
 ## Future Features
 
