@@ -29,7 +29,7 @@ static const char *month_names[] = { "Pop", "Uo", "Zip", "Zotz'", "Tzek", "Xul",
      , "Kayab", "K'umk'u", "Uayeb" };
 
 double
-get_working_time (void) {
+get_working_time (void) { /* returns the current time in days */
      struct tm new_epoch;
      new_epoch.tm_year = 2012 - 1900;
      new_epoch.tm_mon = 11;
@@ -43,7 +43,7 @@ get_working_time (void) {
 }
 
 struct mayaT
-from_working_time_to_maya (double wt) {
+from_working_time_to_maya (double wt) { /* Converts the time in days to time in a maya struct */
      struct mayaT mt;
      double a, b, c, d;
      a = fmod(wt,144000);
@@ -58,8 +58,20 @@ from_working_time_to_maya (double wt) {
      return mt;
 }
 
+double
+from_maya_to_working_time (struct mayaT *mt) /* Converts a maya struct of time to days*/
+{
+     double days;
+     days =  (double)(mt->mayaT_baktun * BAKTUN);
+     days += (double)(mt->mayaT_katun * KATUN);
+     days += (double)(mt->mayaT_tun * TUN);
+     days += (double)(mt->mayaT_uinal * UINAL);
+     days += (double)(mt->mayaT_kin * KIN);
+     return days;
+
+}
 void
-mprint(int num)
+mprint(int num) /* Currently not in use. prints a number in to dots and bar (up to 19)*/
 {
      int dnum, bnum;
      bnum = num/5;
@@ -82,7 +94,7 @@ mprint(int num)
 }
 
 void
-convert (int num) {
+convert (int num) { /* Currently not in use. prints a number in to dots and bar (up to infinty)*/
      int get_highest, working_number, current_divider;
      get_highest = (int)(log10(num)/log10(20));
      working_number = num;
@@ -96,7 +108,7 @@ convert (int num) {
 }
 
 void
-print_calendar_round (int working_time) {
+print_calendar_round (int working_time) { /* Formats time in days to the month and days in the Maya calendar*/
      int wn, nmonth, imonth;
      int nday, iday;
      wn = (working_time%365 + days_toadd)%365;
@@ -109,28 +121,21 @@ print_calendar_round (int working_time) {
 }
 
 void
-print_long_round (struct mayaT *mt) {
+print_long_round (struct mayaT *mt) { /* Prints the given Maya struct */
      printf("%d.%d.%d.%d.%d\n", (int)mt->mayaT_baktun,
             (int)mt->mayaT_katun, (int)mt->mayaT_tun,
             (int)mt->mayaT_uinal, (int)mt->mayaT_kin);
 }
 
-void fill_mayaT (struct mayaT *mt) {
-     mt->mayaT_baktun = 0;
-     mt->mayaT_katun = 0;
-     mt->mayaT_tun = 0;
-     mt->mayaT_uinal = 0;
-     mt->mayaT_kin = 0;
-}
-
 void
-fill_array(int arr[5])
+fill_array(int arr[5]) /* Fills an array of 5 elements only used in one function */
 {
      for (int i = 0; i < 5; i++)
           arr[i] = 0;
 }
 
-void reverse(int *x, int begin, int end) {
+void
+reverse(int *x, int begin, int end) { /* flips an array of ints */
      int c;
 
      if (begin >= end)
@@ -144,12 +149,13 @@ void reverse(int *x, int begin, int end) {
 }
 
 struct mayaT
-*string2maya (char *string) {
+string2maya (char *string) { /* To parse an user input of time doesn't check if its valid */
      struct mayaT maya_out;
      int maya_array[5], i;
      const char del[2] = ".";
      char *token;
-     fill_mayaT(&maya_out);
+     double *maya_ptr = &(maya_out.mayaT_baktun);
+
      fill_array(maya_array);
      token = strtok(string, del);
      i = 0;
@@ -163,5 +169,17 @@ struct mayaT
      for (int i = 0; i < 5; i++) {
           printf("%d\n", maya_array[i]);
      }
-     return &maya_out;
+     for (int i = 0; i < sizeof(maya_out)/sizeof(double); i++)
+     {
+          *maya_ptr = maya_array[i];
+          (*maya_ptr)++;
+     }
+     return maya_out;
+}
+
+struct mayaT
+add_dates (struct mayaT *add, struct mayaT *to) { /* Adds two dates and return the result */
+     double totalDays;
+     totalDays = from_maya_to_working_time(add) + from_maya_to_working_time(to);
+     return from_working_time_to_maya(totalDays);
 }
