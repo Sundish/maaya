@@ -1,7 +1,7 @@
 # maaya
 
 ## What it does
-Prints the current time in two posible ways, the first is the long round format
+Prints the current time in two posible ways, long round format:
 
 ```
 $ maaya
@@ -11,7 +11,7 @@ $ maaya -l
 $ 0.0.8.7.10
 ```
 
-The second one is according the Calendar round
+The second one is according the Calendar round:
 
 ```
 $ maaya -c 
