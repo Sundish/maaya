@@ -167,13 +167,25 @@ string2maya (char *instr, struct mayaT *mt) { /* To parse an user input of time 
 }
 
 void
-add_dates_all (struct mayaT *may_ptr, int size, int beg) {
-     double totalD = 0.0;
+add_dates_all (struct mayaT *may_ptr, int size, int beg, int use_ct) {
+     double totalD = use_ct ? get_working_time() : 0.0;
      while (size >= beg) {
-          totalD += from_maya_to_working_time(may_ptr);
-          may_ptr++;
+          totalD += from_maya_to_working_time(may_ptr++);
           beg++;
      }
      from_working_time_to_maya(totalD, may_ptr);
      print_long_round(may_ptr);
+     exit(0);
+}
+
+void
+substract_dates_all (struct mayaT *may_ptr, int size, int beg, int use_ct) {
+     double totalD = use_ct ? get_working_time() : 0.0;
+     while (size >= beg) {
+          totalD -= from_maya_to_working_time(may_ptr++);
+          beg++;
+     }
+     from_working_time_to_maya(totalD, may_ptr);
+     print_long_round(may_ptr);
+     exit(0);
 }

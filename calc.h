@@ -16,4 +16,5 @@ void fill_mayaT (struct mayaT *mt); /* Currently unused */
 void mprint(int num); /* Currently unused */
 void convert(int num); /* Currently unused */
 void string2maya (char *instr, struct mayaT *mt);
-void add_dates_all (struct mayaT *may_ptr, int size, int beg);
+void add_dates_all (struct mayaT *may_ptr, int size, int beg, int use_ct);
+void substract_dates_all (struct mayaT *may_ptr, int size, int beg, int use_ct);
