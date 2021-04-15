@@ -22,11 +22,11 @@ const int days_toadd = 263; /* (total_day_numbers%365 + 263)%365*/
 
 static const char *day_names[] = { "Ahaw", "Imix", "Ik'", "Ak'bal", "K'an", "Chikchán", "Kimi", "Manik"
               , "Lamat", "Muluc", "Ok", "Chuen", "Eb", "Ben", "Ix", "Men", "Kib"
-              , "Kaban", "Etz'nab", "Kauak" };
+              , "Kaban", "Etz'nab", "Kawak" };
 
 static const char *month_names[] = { "Pop", "Uo", "Zip", "Zotz'", "Tzek", "Xul", "YaxKin", "Mol"
      , "Ch'en", "Yax", "Zak", "Keh", "Mak", "Kankin", "Muan", "Pax"
-     , "Kayab", "K'umk'u", "Uayeb" };
+     , "Kayab", "K'umk'u", "Wayeb" };
 
 double
 get_working_time (void) { /* returns the current time in days */
@@ -42,31 +42,30 @@ get_working_time (void) { /* returns the current time in days */
                                       mktime(&new_epoch)));
 }
 
-struct mayaT
-from_working_time_to_maya (double wt) { /* Converts the time in days to time in a maya struct */
-     struct mayaT mt;
+void
+from_working_time_to_maya (double wt, struct mayaT *mt) { /* Converts the time in days to time in a maya struct */
      double a, b, c, d;
      a = fmod(wt,144000);
      b = fmod(a, 7200);
      c = fmod(b, 360);
      d = fmod(c, 20);
-     mt.mayaT_baktun = (wt/BAKTUN);
-     mt.mayaT_katun = (a/KATUN);
-     mt.mayaT_tun = (b/TUN);
-     mt.mayaT_uinal = (c/UINAL);
-     mt.mayaT_kin = d;
-     return mt;
+     mt->mayaT_baktun = (wt/BAKTUN);
+     mt->mayaT_katun = (a/KATUN);
+     mt->mayaT_tun = (b/TUN);
+     mt->mayaT_uinal = (c/UINAL);
+     mt->mayaT_kin = d;
 }
 
 double
 from_maya_to_working_time (struct mayaT *mt) /* Converts a maya struct of time to days*/
 {
      double days;
-     days =  (double)(mt->mayaT_baktun * BAKTUN);
-     days += (double)(mt->mayaT_katun * KATUN);
-     days += (double)(mt->mayaT_tun * TUN);
-     days += (double)(mt->mayaT_uinal * UINAL);
-     days += (double)(mt->mayaT_kin * KIN);
+     days =  (mt->mayaT_baktun * BAKTUN);
+     days += (mt->mayaT_katun * KATUN);
+     days += (mt->mayaT_tun * TUN);
+     days += (mt->mayaT_uinal * UINAL);
+     days += (mt->mayaT_kin * KIN);
+     /* printf("DAYS: %f\n",days); */
      return days;
 
 }
@@ -128,10 +127,13 @@ print_long_round (struct mayaT *mt) { /* Prints the given Maya struct */
 }
 
 void
-fill_array(int arr[5]) /* Fills an array of 5 elements only used in one function */
+fill_mayaT (struct mayaT *mt)
 {
-     for (int i = 0; i < 5; i++)
-          arr[i] = 0;
+     mt->mayaT_baktun = 0;
+     mt->mayaT_katun = 0;
+     mt->mayaT_tun = 0;
+     mt->mayaT_uinal = 0;
+     mt->mayaT_kin = 0;
 }
 
 void
@@ -148,38 +150,30 @@ reverse(int *x, int begin, int end) { /* flips an array of ints */
      reverse(x, ++begin, --end);
 }
 
-struct mayaT
-string2maya (char *string) { /* To parse an user input of time doesn't check if its valid */
-     struct mayaT maya_out;
-     int maya_array[5], i;
+void
+string2maya (char *instr, struct mayaT *mt) { /* To parse an user input of time doesn't check if its valid */
      const char del[2] = ".";
      char *token;
-     double *maya_ptr = &(maya_out.mayaT_baktun);
+     double *maya_ptr = &(mt->mayaT_baktun);
 
-     fill_array(maya_array);
-     token = strtok(string, del);
-     i = 0;
+
+     token = strtok(instr, del);
+
      while ( token != NULL ) {
-          maya_array[i] = atoi(token);
-          /* printf(" %s\n", token); */
+          *maya_ptr = atoi(token);
           token = strtok(NULL, del);
-          i++;
+          maya_ptr++;
      }
-     reverse(maya_array , 0, sizeof(maya_array)/sizeof(maya_array[0]) -1);
-     for (int i = 0; i < 5; i++) {
-          printf("%d\n", maya_array[i]);
-     }
-     for (int i = 0; i < sizeof(maya_out)/sizeof(double); i++)
-     {
-          *maya_ptr = maya_array[i];
-          (*maya_ptr)++;
-     }
-     return maya_out;
 }
 
-struct mayaT
-add_dates (struct mayaT *add, struct mayaT *to) { /* Adds two dates and return the result */
-     double totalDays;
-     totalDays = from_maya_to_working_time(add) + from_maya_to_working_time(to);
-     return from_working_time_to_maya(totalDays);
+void
+add_dates_all (struct mayaT *may_ptr, int size, int beg) {
+     double totalD = 0.0;
+     while (size >= beg) {
+          totalD += from_maya_to_working_time(may_ptr);
+          may_ptr++;
+          beg++;
+     }
+     from_working_time_to_maya(totalD, may_ptr);
+     print_long_round(may_ptr);
 }
