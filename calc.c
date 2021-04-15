@@ -180,7 +180,8 @@ add_dates_all (struct mayaT *may_ptr, int size, int beg, int use_ct) {
 
 void
 substract_dates_all (struct mayaT *may_ptr, int size, int beg, int use_ct) {
-     double totalD = use_ct ? get_working_time() : 0.0;
+     double totalD = use_ct ? get_working_time() : from_maya_to_working_time(may_ptr++);
+     beg++;
      while (size >= beg) {
           totalD -= from_maya_to_working_time(may_ptr++);
           beg++;
