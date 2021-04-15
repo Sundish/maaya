@@ -26,8 +26,6 @@ $ maaya + 0.0.1.2.1 0.9.1.0.0
 $ 0.9.2.2.1
 ```
 
-For now you need to enter at least two dates.
-
 ## Installation
 Just run `make` and `make install` to copy the binary file to `/usr/bin`
 
